@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/Users/marylou/Library/Application Support/Herd/bin/php84",
+            "args": [
+                "/Users/marylou/Dev/hua-oudegracht-app/ontmoet-de-oudegracht/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
