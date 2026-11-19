@@ -9,3 +9,7 @@ Route::get('/', function () {
 Route::get('cms', function () {
     return view('CMS.cms');
 });
+
+Route::get('cms-login', function () {
+    return view('CMS.login');
+});
