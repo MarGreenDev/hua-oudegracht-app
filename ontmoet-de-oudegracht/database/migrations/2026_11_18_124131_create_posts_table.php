@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('text_content');
             $table->date('date');
             $table->string('image')->nullable();
+            $table->string('image2')->nullable();
+            $table->string('image3')->nullable();
+            $table->string('image4')->nullable();
+            $table->string('image5')->nullable();
         });
     }
 
