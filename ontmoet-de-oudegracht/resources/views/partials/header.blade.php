@@ -35,7 +35,7 @@
             </div>
 
             {{-- Colour blocks --}}
-            <div class="grid min-w-0 flex-1 grid-flow-col grid-rows-2 auto-cols-[30px] gap-[6px] overflow-hidden">
+            <div class="grid min-w-0 flex-1 grid-flow-col grid-rows-2 auto-cols-[30px] gap-[3px] overflow-hidden">
                 @for ($col = 0; $col < $columns; $col++)
                     @for ($row = 0; $row < $rows; $row++)
                         <div class="{{ $blocks[$row][$col] }} size-[30px]"></div>
