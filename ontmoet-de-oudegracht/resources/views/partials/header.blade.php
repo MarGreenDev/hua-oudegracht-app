@@ -30,10 +30,11 @@
         <header class="flex h-[66px] overflow-hidden bg-white">
 
             {{-- Logo --}}
+            <a href="/">
             <div class="flex h-full w-[66px] shrink-0 items-center justify-start bg-white">
                 <img src="{{ asset('assets/images/logo.png') }}" class="h-[66px] w-[66px] object-contain p-0" alt="Utrechts Archief">
             </div>
-
+            </a>
             {{-- Colour blocks --}}
             <div class="grid min-w-0 flex-1 grid-flow-col grid-rows-2 auto-cols-[30px] gap-[3px] overflow-hidden">
                 @for ($col = 0; $col < $columns; $col++)
