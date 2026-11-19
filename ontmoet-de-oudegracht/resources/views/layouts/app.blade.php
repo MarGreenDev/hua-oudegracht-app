@@ -8,12 +8,14 @@
     <title>@yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="overflow-hidden">
 
 @include('partials.header')
 
-<main>
+<main class="border-t-theme-1 border-t-3">
     @yield('content')
 </main>
+
+@include('partials.footer')
 </body>
 </html>
