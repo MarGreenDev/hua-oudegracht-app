@@ -7,7 +7,7 @@ if (mapElement) {
     const textArea = document.querySelector('#post-text-area');
     const posts = JSON.parse(mapElement.dataset.posts || '[]');
 
-    const map = L.map(mapElement).setView([52.0897, 5.1213], 15);
+    const map = L.map(mapElement);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -59,10 +59,15 @@ if (mapElement) {
         textArea.append(article);
     }
 
+    const markerLocations = [];
+
     posts.forEach((post) => {
         if (post.latitude === null || post.longitude === null) return;
 
-        const marker = L.marker([Number(post.latitude), Number(post.longitude)]).addTo(map);
+        const location = [Number(post.latitude), Number(post.longitude)];
+        markerLocations.push(location);
+
+        const marker = L.marker(location).addTo(map);
         marker.on('click', () => {
             renderPost(post);
 
@@ -72,4 +77,12 @@ if (mapElement) {
             }
         });
     });
+
+    if (markerLocations.length === 1) {
+        map.setView(markerLocations[0], 16);
+    } else if (markerLocations.length > 1) {
+        map.fitBounds(markerLocations, { padding: [30, 30] });
+    } else {
+        map.setView([52.0897, 5.1213], 15);
+    }
 }
