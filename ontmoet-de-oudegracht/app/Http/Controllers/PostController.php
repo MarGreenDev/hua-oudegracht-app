@@ -14,11 +14,14 @@ class PostController extends Controller
             'place' => ['required', 'string', 'max:255'],
             'text_content' => ['required', 'string'],
             'date' => ['required', 'date'],
-            'image' => ['nullable', 'image', 'max:5120'],
-            'image2' => ['nullable', 'image', 'max:5120'],
-            'image3' => ['nullable', 'image', 'max:5120'],
-            'image4' => ['nullable', 'image', 'max:5120'],
-            'image5' => ['nullable', 'image', 'max:5120'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'video_timestamp' => ['required', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image'],
+            'image2' => ['nullable', 'image'],
+            'image3' => ['nullable', 'image'],
+            'image4' => ['nullable', 'image'],
+            'image5' => ['nullable', 'image'],
         ]);
 
         foreach (['image', 'image2', 'image3', 'image4', 'image5'] as $field) {

@@ -2,16 +2,45 @@
 
 @section('content')
 <div class="flex justify-between overflow-hidden">
-    <video src="{{asset('assets/videos/filmopname_oudegracht.mp4')}}"
+    <video id="main-video"
+           src="{{ asset('assets/videos/filmopname_oudegracht.mp4') }}"
            class="w-full"
            controls
            autoplay
            loop
     > </video>
 
-    <div class="flex min-w-0 flex-col">
-        <div class="flex-1">
-            <h2>TESKSTVAK</h2>
+    <div class="flex w-[500px] shrink-0 flex-col">
+        <div id="post-text-area" class="h-[300px] overflow-y-auto">
+            @if ($latestPost)
+                <article>
+                    <h2 class="text-2xl font-bold">{{ $latestPost->title }}</h2>
+
+                    @if ($latestPost->place)
+                        <p>{{ $latestPost->place }}</p>
+                    @endif
+
+                    @if ($latestPost->date)
+                        <time datetime="{{ $latestPost->date }}">
+                            {{ \Illuminate\Support\Carbon::parse($latestPost->date)->format('d-m-Y') }}
+                        </time>
+                    @endif
+
+                    <p>{{ $latestPost->text_content }}</p>
+
+                    @foreach (['image', 'image2', 'image3', 'image4', 'image5'] as $imageField)
+                        @if ($latestPost->$imageField)
+                            <img
+                                src="{{ asset('storage/' . $latestPost->$imageField) }}"
+                                alt=""
+                                class="mt-2 max-h-48 w-full object-cover"
+                            >
+                        @endif
+                    @endforeach
+                </article>
+            @else
+                <h2>TESKSTVAK</h2>
+            @endif
         </div>
 
         <p class="w-full overflow-hidden whitespace-nowrap" aria-hidden="true">
@@ -19,7 +48,12 @@
 {{--            how to make dynamic??--}}
         </p>
 
-        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d541.8045001426383!2d5.1213025000093255!3d52.08974400673565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1snl!2snl!4v1795090466943!5m2!1snl!2snl" width="500" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <div
+            id="post-map"
+            data-posts="{{ json_encode($posts) }}"
+            class="h-[300px] w-[500px]"
+            aria-label="Map with post locations"
+        ></div>
     </div>
 </div>
 @endsection

@@ -45,6 +45,23 @@
                 <input type="date" name="date" value="{{ old('date') }}" required class="border p-2">
             </label>
 
+            <div class="grid grid-cols-2 gap-4">
+                <label class="flex flex-col gap-1">
+                    Latitude
+                    <input type="number" name="latitude" value="{{ old('latitude') }}" step="0.0000001" min="-90" max="90" required class="border p-2">
+                </label>
+
+                <label class="flex flex-col gap-1">
+                    Longitude
+                    <input type="number" name="longitude" value="{{ old('longitude') }}" step="0.0000001" min="-180" max="180" required class="border p-2">
+                </label>
+            </div>
+
+            <label class="flex flex-col gap-1">
+                Video timestamp (seconds)
+                <input type="number" name="video_timestamp" value="{{ old('video_timestamp') }}" step="0.001" min="0" required class="border p-2">
+            </label>
+
             @for ($i = 1; $i <= 5; $i++)
                 @php
                     $field = $i === 1 ? 'image' : 'image' . $i;

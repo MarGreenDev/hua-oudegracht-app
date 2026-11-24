@@ -3,9 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
+use App\Models\Post;
 
 Route::get('/', function () {
-    return view('app');
+    return view('app', [
+        'latestPost' => Post::latest('id')->first(),
+        'posts' => Post::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->orderBy('id')
+            ->get(),
+    ]);
 });
 
 Route::get('cms', function () {
