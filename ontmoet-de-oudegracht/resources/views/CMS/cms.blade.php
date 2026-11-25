@@ -3,6 +3,7 @@
 @section('body-class', 'overflow-y-auto')
 
 @section('content')
+    @include('partials.logout')
     <div class="mx-auto max-w-2xl p-6">
         <h1 class="mb-6 text-3xl font-bold">Create post</h1>
 

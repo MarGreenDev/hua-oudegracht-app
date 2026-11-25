@@ -19,6 +19,8 @@ Route::get('login', function () {
     return view('CMS.login');
 });
 
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 Route::post('cms-login', [LoginController::class, 'login']);
 
 Route::middleware('admin')->group(function () {
