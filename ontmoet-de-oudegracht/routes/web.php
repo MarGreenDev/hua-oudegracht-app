@@ -27,6 +27,12 @@ Route::get('cms-login', function () {
 
 Route::post('cms-login', [LoginController::class, 'login']);
 
-Route::get('login-test', function () {
-    return view('logintest');
+//Route::get('login-test', function () {
+//    return view('logintest');
+//});
+
+Route::middleware('admin')->group(function () {
+    Route::get('/logintest', function () {
+        return view('logintest');
+    })->name('logintest');
 });
