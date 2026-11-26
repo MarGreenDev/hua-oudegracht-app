@@ -63,31 +63,92 @@ if (mapElement) {
     }
 
     let activeVideoSeek = 0;
+    let activeSeekFrame = null;
+    let activeReverseSeek = null;
+    // Use normal playback for fast-forward; the browser doesn't support reverse playback reliably.
+    const seekPlaybackRate = 16;
 
     function seekVideoToTimestamp(timestamp) {
         if (!video || !Number.isFinite(timestamp) || timestamp < 0) return;
 
         const seekId = ++activeVideoSeek;
+        // Stop any previous marker seek so only the most recently clicked marker controls playback.
+        if (activeSeekFrame !== null) cancelAnimationFrame(activeSeekFrame);
+        if (activeReverseSeek !== null) clearInterval(activeReverseSeek);
+        video.pause();
+        video.playbackRate = 1;
+
         const seek = () => {
             if (seekId !== activeVideoSeek) return;
 
             const targetTime = Math.min(timestamp, video.duration);
-
             if (!Number.isFinite(targetTime)) return;
-            video.pause();
 
-            if (Math.abs(video.currentTime - targetTime) < 0.05) {
-                video.playbackRate = 1;
-                video.play().catch(() => {});
-                return;
-            }
-
-            video.addEventListener('seeked', () => {
+            const resumeAtTarget = () => {
                 if (seekId !== activeVideoSeek) return;
                 video.playbackRate = 1;
                 video.play().catch(() => {});
-            }, { once: true });
-            video.currentTime = targetTime;
+            };
+
+            const finishSeek = () => {
+                if (seekId !== activeVideoSeek) return;
+                if (activeSeekFrame !== null) cancelAnimationFrame(activeSeekFrame);
+                if (activeReverseSeek !== null) clearInterval(activeReverseSeek);
+                activeSeekFrame = null;
+                activeReverseSeek = null;
+                video.pause();
+                video.playbackRate = 1;
+
+                // Correct any small timing difference, then resume at normal speed.
+                if (Math.abs(video.currentTime - targetTime) < 0.05) {
+                    resumeAtTarget();
+                    return;
+                }
+
+                video.addEventListener('seeked', resumeAtTarget, { once: true });
+                video.currentTime = targetTime;
+            };
+
+            const difference = targetTime - video.currentTime;
+            if (Math.abs(difference) < 0.05) {
+                finishSeek();
+            } else if (difference > 0) {
+                // Let the browser play forward quickly while monitoring for the target.
+                video.playbackRate = seekPlaybackRate;
+                video.play().catch(() => {
+                    if (seekId !== activeVideoSeek) return;
+                    if (activeSeekFrame !== null) cancelAnimationFrame(activeSeekFrame);
+                    activeSeekFrame = null;
+                    video.playbackRate = 1;
+                });
+
+                const advance = () => {
+                    if (seekId !== activeVideoSeek) return;
+                    if (video.currentTime >= targetTime) {
+                        finishSeek();
+                        return;
+                    }
+                    activeSeekFrame = requestAnimationFrame(advance);
+                };
+                activeSeekFrame = requestAnimationFrame(advance);
+            } else {
+                // Simulate rewind by stepping currentTime backward, then seek precisely at the target.
+                let previousTime = performance.now();
+                activeReverseSeek = setInterval(() => {
+                    if (seekId !== activeVideoSeek) return;
+
+                    const now = performance.now();
+                    const elapsed = (now - previousTime) / 1000;
+                    previousTime = now;
+                    const nextTime = video.currentTime - elapsed * seekPlaybackRate;
+
+                    if (nextTime <= targetTime) {
+                        finishSeek();
+                    } else {
+                        video.currentTime = nextTime;
+                    }
+                }, 25);
+            }
         };
 
         if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
