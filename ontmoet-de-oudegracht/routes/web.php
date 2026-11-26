@@ -28,9 +28,8 @@ Route::middleware('admin')->group(function () {
         return view('logintest');
     })->name('logintest');
 
-    Route::get('/cms', function () {
-        return view('CMS.cms');
-    });
-
-    Route::post('cms/posts', [PostController::class, 'store']);
+    Route::get('/cms', [PostController::class, 'index'])->name('cms.index');
+    Route::post('cms/posts', [PostController::class, 'store'])->name('cms.posts.store');
+    Route::patch('cms/posts/{post}', [PostController::class, 'update'])->name('cms.posts.update');
+    Route::delete('cms/posts/{post}', [PostController::class, 'destroy'])->name('cms.posts.destroy');
 });
