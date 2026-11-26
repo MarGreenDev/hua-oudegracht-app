@@ -10,7 +10,7 @@
     > </video>
 
     <div class="flex w-[500px] shrink-0 flex-col">
-        <div id="post-text-area" class="h-[300px] overflow-y-auto">
+        <div id="post-text-area" class="h-[300px] overflow-y-auto flex-1">
             @if ($latestPost)
                 <article>
                     <h2 class="text-2xl font-bold">{{ $latestPost->title }}</h2>
