@@ -5,60 +5,67 @@
 @section('content')
     @include('partials.logout')
 
-    <div class="mx-auto max-w-6xl p-6">
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div>
+    <div class="mx-auto max-w-7xl p-6" style="display: grid; grid-template-columns: minmax(0, 1fr) 16rem; gap: 2rem;">
+        <section style="min-width: 0;">
+            <div class="mb-6">
                 <h1 class="text-3xl font-bold">Posts</h1>
                 <p class="mt-1 text-gray-600">Manage the posts shown on the map.</p>
             </div>
-            <button type="button" id="create-post-button" class="bg-theme-1 px-5 py-3 font-semibold text-white">
+
+            @if (session('success'))
+                <p class="mb-4 rounded bg-green-100 p-3 text-green-800" role="status">
+                    {{ session('success') }}
+                </p>
+            @endif
+
+            @if ($posts->isEmpty())
+                <p class="rounded border border-gray-200 p-6 text-gray-600">No posts yet. Create your first post to get started.</p>
+            @else
+                <div class="overflow-y-auto pr-2" style="max-height: calc(100vh - 15rem);">
+                    <div class="grid gap-4 grid-cols-2">
+                    @foreach ($posts as $post)
+                        <article class="flex flex-col overflow-hidden rounded border border-gray-200 bg-white shadow-sm">
+                            @if ($post->image)
+                                <img src="{{ asset('storage/' . $post->image) }}" alt="" class="h-24 w-full object-cover">
+                            @endif
+                            <div class="flex flex-1 flex-col p-4">
+                                <h2 class="text-xl font-semibold">{{ $post->title }}</h2>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    {{ $post->place }}@if ($post->date) · {{ $post->date }}@endif
+                                </p>
+                                <p class="mt-3 flex-1 text-gray-700">{{ \Illuminate\Support\Str::limit($post->text_content, 180) }}</p>
+                                <div class="mt-4 flex gap-3">
+                                    <button
+                                        type="button"
+                                        class="edit-post-button border border-theme-1 px-4 py-2 text-theme-1"
+                                        data-post="{{ json_encode($post) }}"
+                                        data-update-url="{{ route('cms.posts.update', ['post' => '__POST__']) }}"
+                                    >
+                                        Edit
+                                    </button>
+                                    <form action="{{ route('cms.posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Remove this post? This cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="border border-red-700 px-4 py-2 text-red-700">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                    </div>
+                </div>
+            @endif
+        </section>
+
+        <aside class="h-fit rounded border border-gray-200 bg-white p-5 shadow-sm" style="grid-column: 2;">
+            <h2 class="text-lg font-semibold">Create a post</h2>
+            <p class="mt-1 text-sm text-gray-600">Add a new story to the map.</p>
+            <button type="button" id="create-post-button" class="mt-4 w-full bg-theme-1 px-4 py-2 font-semibold text-white">
                 New post
             </button>
-        </div>
-
-        @if (session('success'))
-            <p class="mb-4 rounded bg-green-100 p-3 text-green-800" role="status">
-                {{ session('success') }}
-            </p>
-        @endif
-
-        @if ($posts->isEmpty())
-            <p class="rounded border border-gray-200 p-6 text-gray-600">No posts yet. Create your first post to get started.</p>
-        @else
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach ($posts as $post)
-                    <article class="flex flex-col overflow-hidden rounded border border-gray-200 bg-white shadow-sm">
-                        @if ($post->image)
-                            <img src="{{ asset('storage/' . $post->image) }}" alt="" class="h-48 w-full object-cover">
-                        @endif
-                        <div class="flex flex-1 flex-col p-4">
-                            <h2 class="text-xl font-semibold">{{ $post->title }}</h2>
-                            <p class="mt-1 text-sm text-gray-600">
-                                {{ $post->place }}@if ($post->date) · {{ $post->date }}@endif
-                            </p>
-                            <p class="mt-3 flex-1 text-gray-700">{{ \Illuminate\Support\Str::limit($post->text_content, 180) }}</p>
-                            <div class="mt-4 flex gap-3">
-                                <button
-                                    type="button"
-                                    class="edit-post-button border border-theme-1 px-4 py-2 text-theme-1"
-                                    data-post="{{ json_encode($post) }}"
-                                    data-update-url="{{ route('cms.posts.update', ['post' => '__POST__']) }}"
-                                >
-                                    Edit
-                                </button>
-                                <form action="{{ route('cms.posts.destroy', $post) }}" method="POST" onsubmit="return confirm('Remove this post? This cannot be undone.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="border border-red-700 px-4 py-2 text-red-700">
-                                        Remove
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        @endif
+        </aside>
     </div>
 
     <dialog id="post-modal" class="m-auto max-h-[90vh] w-[min(42rem,calc(100%-2rem))] overflow-y-auto rounded-lg p-0 shadow-xl backdrop:bg-black/60">
