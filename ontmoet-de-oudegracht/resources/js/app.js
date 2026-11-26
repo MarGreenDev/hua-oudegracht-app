@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import './cms.js';
+import { getVideoRouteProgress } from './video-route.js';
 
 const mapElement = document.querySelector('#post-map');
 
@@ -7,6 +8,7 @@ if (mapElement) {
     const video = document.querySelector('#main-video');
     const textArea = document.querySelector('#post-text-area');
     const posts = JSON.parse(mapElement.dataset.posts || '[]');
+    const boatRoute = JSON.parse(mapElement.dataset.videoRoute || '[]');
 
     const map = L.map(mapElement);
 
@@ -60,22 +62,80 @@ if (mapElement) {
         textArea.append(article);
     }
 
+    let activeVideoSeek = 0;
+
+    function seekVideoToTimestamp(timestamp) {
+        if (!video || !Number.isFinite(timestamp) || timestamp < 0) return;
+
+        const seekId = ++activeVideoSeek;
+        const seek = () => {
+            if (seekId !== activeVideoSeek) return;
+
+            const targetTime = Math.min(timestamp, video.duration);
+
+            if (!Number.isFinite(targetTime)) return;
+            video.pause();
+
+            if (Math.abs(video.currentTime - targetTime) < 0.05) {
+                video.playbackRate = 1;
+                video.play().catch(() => {});
+                return;
+            }
+
+            video.addEventListener('seeked', () => {
+                if (seekId !== activeVideoSeek) return;
+                video.playbackRate = 1;
+                video.play().catch(() => {});
+            }, { once: true });
+            video.currentTime = targetTime;
+        };
+
+        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+            seek();
+        } else {
+            video.addEventListener('loadedmetadata', seek, { once: true });
+        }
+    }
+
+    function seekVideoToPost(post) {
+        if (!video) return;
+
+        const seek = () => {
+            let timestamp = post.video_timestamp === null || post.video_timestamp === undefined
+                ? NaN
+                : Number(post.video_timestamp);
+
+            if (
+                timestamp === 0
+                && Number.isFinite(video.duration)
+                && video.duration > 0
+                && boatRoute.length >= 2
+            ) {
+                const progress = getVideoRouteProgress(
+                    Number(post.latitude),
+                    Number(post.longitude),
+                    boatRoute,
+                );
+                if (progress > 0) timestamp = progress * video.duration;
+            }
+
+            if (!Number.isFinite(timestamp) || timestamp < 0) return;
+
+            seekVideoToTimestamp(timestamp);
+        };
+
+        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+            seek();
+        } else {
+            video.addEventListener('loadedmetadata', seek, { once: true });
+        }
+    }
+
     // Marker locations are collected so the map can show all post markers.
     const markerLocations = [];
 
     // Each coordinate is one point in the Oudegracht route.
     // The boat will travel through these points from Gaardbrug to Stadhuisbrug.
-    const boatRoute = [
-        [52.0891988, 5.1211682],
-        [52.0894500, 5.1209800],
-        [52.0897800, 5.1208200],
-        [52.0901300, 5.1206700],
-        [52.0904700, 5.1204900],
-        [52.0908200, 5.1203000],
-        [52.0911700, 5.1200800],
-        [52.0915523, 5.1197017],
-    ];
-
     posts.forEach((post) => {
         if (post.latitude === null || post.longitude === null) return;
 
@@ -85,11 +145,7 @@ if (mapElement) {
         const marker = L.marker(location).addTo(map);
         marker.on('click', () => {
             renderPost(post);
-
-            if (video && post.video_timestamp !== null) {
-                video.currentTime = Number(post.video_timestamp);
-                video.play().catch(() => {});
-            }
+            seekVideoToPost(post);
         });
     });
 

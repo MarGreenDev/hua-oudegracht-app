@@ -3,11 +3,10 @@
 @section('content')
 <div class="flex justify-between overflow-hidden">
     <video id="main-video"
-           src="{{ asset('assets/videos/filmopname_oudegracht.mp4') }}"
+           src="{{ route('video.stream') }}"
            class="w-full"
-           controls
-           autoplay
-           loop
+           preload="metadata"
+           playsinline
     > </video>
 
     <div class="flex w-[500px] shrink-0 flex-col">
@@ -51,6 +50,7 @@
         <div
             id="post-map"
             data-posts="{{ json_encode($posts) }}"
+            data-video-route="{{ json_encode($videoRoute) }}"
             class="h-[300px] w-[500px]"
             aria-label="Map with post locations"
         ></div>

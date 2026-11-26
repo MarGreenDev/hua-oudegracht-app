@@ -3,17 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\VideoController;
 use App\Models\Post;
+use App\Support\VideoRoute;
 
 Route::get('/', function () {
+    $posts = Post::whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->orderBy('id')
+        ->get()
+        ->each(function (Post $post): void {
+            $post->video_timestamp = VideoRoute::timestamp(
+                (float) $post->latitude,
+                (float) $post->longitude,
+                (float) config('video.duration'),
+            );
+        });
+
     return view('app', [
         'latestPost' => Post::latest('id')->first(),
-        'posts' => Post::whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->orderBy('id')
-            ->get(),
+        'videoRoute' => config('video.route'),
+        'posts' => $posts,
     ]);
 });
+
+Route::get('/video/filmopname_oudegracht.mp4', VideoController::class)->name('video.stream');
 
 Route::get('login', function () {
     return view('CMS.login');

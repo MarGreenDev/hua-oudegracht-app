@@ -94,6 +94,8 @@
                 data-store-url="{{ route('cms.posts.store') }}"
                 data-update-url="{{ route('cms.posts.update', ['post' => '__POST__']) }}"
                 data-validation-post-id="{{ old('post_id') }}"
+                data-video-route="{{ json_encode(config('video.route')) }}"
+                data-video-duration="{{ config('video.duration') }}"
                 data-open-on-load="{{ $errors->any() ? 'true' : 'false' }}"
                 class="flex flex-col gap-4"
             >
@@ -134,8 +136,11 @@
                 </div>
 
                 <label class="flex flex-col gap-1">
-                    Video timestamp (seconds)
-                    <input type="number" name="video_timestamp" value="{{ old('video_timestamp') }}" step="0.001" min="0" required class="border p-2">
+                    Calculated video timestamp (seconds)
+                    <input type="text" id="video-timestamp-display" value="" readonly class="border bg-gray-100 p-2">
+                    <span id="video-timestamp-status" class="text-sm text-gray-600" role="status">
+                        Timestamp is calculated from the location along the video route.
+                    </span>
                 </label>
 
                 @for ($i = 1; $i <= 5; $i++)

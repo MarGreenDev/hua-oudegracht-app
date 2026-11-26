@@ -1,11 +1,61 @@
+import { getVideoRouteProgress } from './video-route.js';
+
 const postModal = document.querySelector('#post-modal');
 const postForm = document.querySelector('#post-form');
 
 if (postModal && postForm) {
-    const postFields = ['title', 'place', 'text_content', 'date', 'latitude', 'longitude', 'video_timestamp'];
+    const postFields = ['title', 'place', 'text_content', 'date', 'latitude', 'longitude'];
     const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
     const methodField = postForm.elements.namedItem('_method');
     const postIdField = postForm.elements.namedItem('post_id');
+    const timestampDisplay = document.querySelector('#video-timestamp-display');
+    const timestampStatus = document.querySelector('#video-timestamp-status');
+    const route = JSON.parse(postForm.dataset.videoRoute || '[]');
+    const videoDuration = Number(postForm.dataset.videoDuration);
+
+    function updateVideoTimestamp() {
+        const latitudeField = postForm.elements.namedItem('latitude');
+        const longitudeField = postForm.elements.namedItem('longitude');
+        const latitude = Number(latitudeField.value);
+        const longitude = Number(longitudeField.value);
+
+        if (
+            !latitudeField.value.trim()
+            || !longitudeField.value.trim()
+            || !Number.isFinite(latitude)
+            || !Number.isFinite(longitude)
+            || latitude < -90
+            || latitude > 90
+            || longitude < -180
+            || longitude > 180
+            || route.length < 2
+        ) {
+            timestampDisplay.value = '';
+            timestampStatus.textContent = 'Enter a valid latitude and longitude to calculate the timestamp.';
+            return;
+        }
+
+        if (!Number.isFinite(videoDuration) || videoDuration <= 0) {
+            timestampDisplay.value = '';
+            timestampStatus.textContent = 'The video duration is not configured.';
+            return;
+        }
+
+        const progress = getVideoRouteProgress(latitude, longitude, route);
+        timestampDisplay.value = (progress * videoDuration).toFixed(3);
+        timestampStatus.textContent = 'Calculated from the location along the video route.';
+    }
+
+    ['latitude', 'longitude'].forEach((field) => {
+        postForm.elements.namedItem(field).addEventListener('input', updateVideoTimestamp);
+    });
+
+    postForm.addEventListener('submit', (event) => {
+        updateVideoTimestamp();
+        if (!timestampDisplay.value) {
+            event.preventDefault();
+        }
+    });
 
     function clearImagePreviews() {
         imageFields.forEach((field) => {
@@ -44,6 +94,7 @@ if (postModal && postForm) {
         postFields.forEach((field) => {
             postForm.elements.namedItem(field).value = post[field] ?? '';
         });
+        updateVideoTimestamp();
         clearImagePreviews();
         showImagePreviews(post);
         document.querySelector('#post-modal-title').textContent = 'Edit post';
@@ -77,5 +128,6 @@ if (postModal && postForm) {
 
     if (postForm.dataset.openOnLoad === 'true') {
         postModal.showModal();
+        updateVideoTimestamp();
     }
 }
