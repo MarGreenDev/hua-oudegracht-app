@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import './cms.js';
 
 const mapElement = document.querySelector('#post-map');
 

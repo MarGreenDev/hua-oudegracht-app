@@ -85,6 +85,9 @@
                 method="POST"
                 enctype="multipart/form-data"
                 data-store-url="{{ route('cms.posts.store') }}"
+                data-update-url="{{ route('cms.posts.update', ['post' => '__POST__']) }}"
+                data-validation-post-id="{{ old('post_id') }}"
+                data-open-on-load="{{ $errors->any() ? 'true' : 'false' }}"
                 class="flex flex-col gap-4"
             >
                 @csrf
@@ -150,77 +153,4 @@
         </div>
     </dialog>
 
-    <script>
-        const postModal = document.querySelector('#post-modal');
-        const postForm = document.querySelector('#post-form');
-        const postFields = ['title', 'place', 'text_content', 'date', 'latitude', 'longitude', 'video_timestamp', 'image', 'image2', 'image3', 'image4', 'image5'];
-        const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
-        const methodField = postForm.elements.namedItem('_method');
-        const postIdField = postForm.elements.namedItem('post_id');
-
-        function clearImagePreviews() {
-            imageFields.forEach((field) => {
-                document.querySelector(`#${field}-preview`).replaceChildren();
-            });
-        }
-
-        function openCreatePost() {
-            postForm.reset();
-            postForm.action = postForm.dataset.storeUrl;
-            postIdField.value = '';
-            methodField.value = '';
-            document.querySelector('#post-modal-title').textContent = 'New post';
-            document.querySelector('#post-submit-button').textContent = 'Create post';
-            clearImagePreviews();
-            postModal.showModal();
-        }
-
-        function openEditPost(post, updateUrl) {
-            postForm.reset();
-            postForm.action = updateUrl.replace('__POST__', encodeURIComponent(post.id));
-            postIdField.value = post.id;
-            methodField.value = 'PATCH';
-            postFields.forEach((field) => {
-                if (!imageFields.includes(field)) {
-                    postForm.elements.namedItem(field).value = post[field] ?? '';
-                }
-            });
-            clearImagePreviews();
-            imageFields.forEach((field) => {
-                if (post[field]) {
-                    const image = document.createElement('img');
-                    image.src = `/storage/${post[field]}`;
-                    image.alt = `Current ${field} image`;
-                    image.className = 'mt-1 max-h-24 w-auto';
-                    document.querySelector(`#${field}-preview`).append(image);
-                }
-            });
-            document.querySelector('#post-modal-title').textContent = 'Edit post';
-            document.querySelector('#post-submit-button').textContent = 'Save changes';
-            postModal.showModal();
-        }
-
-        document.querySelector('#create-post-button').addEventListener('click', openCreatePost);
-        document.querySelector('#close-post-modal').addEventListener('click', () => postModal.close());
-        document.querySelector('#cancel-post-modal').addEventListener('click', () => postModal.close());
-
-        document.querySelectorAll('.edit-post-button').forEach((button) => {
-            button.addEventListener('click', () => {
-                openEditPost(JSON.parse(button.dataset.post), button.dataset.updateUrl);
-            });
-        });
-
-        @if ($errors->any())
-            @if (old('post_id'))
-                const oldPost = @json($posts->firstWhere('id', old('post_id')));
-                if (oldPost) {
-                    const updateUrl = @json(route('cms.posts.update', ['post' => '__POST__']));
-                    postForm.action = updateUrl.replace('__POST__', encodeURIComponent(oldPost.id));
-                    document.querySelector('#post-modal-title').textContent = 'Edit post';
-                    document.querySelector('#post-submit-button').textContent = 'Save changes';
-                }
-            @endif
-            postModal.showModal();
-        @endif
-    </script>
 @endsection
