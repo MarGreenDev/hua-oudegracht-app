@@ -4,13 +4,16 @@
 @section('html-lang', 'nl')
 
 @section('content')
-<dialog id="intro-dialog" class="intro-dialog" aria-labelledby="intro-dialog-title">
+<dialog id="intro-dialog" class="intro-dialog rounded-xl" aria-labelledby="intro-dialog-title">
     <h2 id="intro-dialog-title" class="intro-dialog-title">Welkom</h2>
     <div class="intro-dialog-content">
-        Neem een tour door de Oudegracht.
+        Neem een tour door de Oudegracht aan de hand van een oude film opname uit 1929.
+        <br>
+        Klik op de markers op
+        de kaart om naar een ander deel van de opname te gaan en leer meer over de locaties.
     </div>
     <form method="dialog">
-        <button class="intro-dialog-button">Start</button>
+        <button class="intro-dialog-button rounded-xl">Start</button>
     </form>
 </dialog>
 
