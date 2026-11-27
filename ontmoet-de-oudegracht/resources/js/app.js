@@ -2,6 +2,12 @@ import L from 'leaflet';
 import './cms.js';
 import { getVideoRouteProgress } from './video-route.js';
 
+const introDialog = document.querySelector('#intro-dialog');
+
+if (introDialog instanceof HTMLDialogElement) {
+    introDialog.showModal();
+}
+
 const mapElement = document.querySelector('#post-map');
 
 if (mapElement) {

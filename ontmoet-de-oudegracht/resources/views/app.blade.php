@@ -4,6 +4,16 @@
 @section('html-lang', 'nl')
 
 @section('content')
+<dialog id="intro-dialog" class="intro-dialog" aria-labelledby="intro-dialog-title">
+    <h2 id="intro-dialog-title" class="intro-dialog-title">Welkom</h2>
+    <div class="intro-dialog-content">
+        Neem een tour door de Oudegracht.
+    </div>
+    <form method="dialog">
+        <button class="intro-dialog-button">Start</button>
+    </form>
+</dialog>
+
 <div class="experience-layout">
     <div class="experience-video-frame">
         <video
