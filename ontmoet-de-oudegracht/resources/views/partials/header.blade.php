@@ -27,7 +27,7 @@
                 }
         @endphp
 
-        <header class="flex h-[66px] overflow-hidden bg-white">
+        <header class="experience-header flex h-[66px] overflow-hidden bg-white">
 
             {{-- Logo --}}
             <a href="/">

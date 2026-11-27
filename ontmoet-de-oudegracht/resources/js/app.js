@@ -11,6 +11,12 @@ if (mapElement) {
     const boatRoute = JSON.parse(mapElement.dataset.videoRoute || '[]');
 
     const map = L.map(mapElement);
+    L.Icon.Default.mergeOptions({
+        iconSize: [44, 54],
+        iconAnchor: [22, 54],
+        popupAnchor: [1, -48],
+        shadowSize: [60, 60],
+    });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -28,24 +34,27 @@ if (mapElement) {
 
         const article = document.createElement('article');
         const title = document.createElement('h2');
-        title.className = 'text-2xl font-bold';
+        title.className = 'experience-post-title';
         title.textContent = post.title;
         article.append(title);
 
         if (post.place) {
             const place = document.createElement('p');
+            place.className = 'experience-post-meta';
             place.textContent = post.place;
             article.append(place);
         }
 
         if (post.date) {
             const date = document.createElement('time');
+            date.className = 'experience-post-meta';
             date.dateTime = post.date;
             date.textContent = formatDate(post.date);
             article.append(date);
         }
 
         const content = document.createElement('p');
+        content.className = 'experience-post-content';
         content.textContent = post.text_content;
         article.append(content);
 
@@ -55,7 +64,7 @@ if (mapElement) {
             const image = document.createElement('img');
             image.src = `/storage/${post[field]}`;
             image.alt = '';
-            image.className = 'mt-2 max-h-48 w-full object-cover';
+            image.className = 'experience-post-image';
             article.append(image);
         });
 
