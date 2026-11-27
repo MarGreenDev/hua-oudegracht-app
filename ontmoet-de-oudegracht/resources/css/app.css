@@ -24,6 +24,7 @@
     background: #fff;
     border: 1px solid #e3e0d8;
     box-shadow: 0 16px 48px rgb(0 0 0 / 25%);
+    margin: 40vh auto;
 }
 
 .intro-dialog::backdrop {
