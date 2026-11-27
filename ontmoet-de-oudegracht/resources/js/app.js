@@ -10,7 +10,15 @@ if (mapElement) {
     const posts = JSON.parse(mapElement.dataset.posts || '[]');
     const boatRoute = JSON.parse(mapElement.dataset.videoRoute || '[]');
 
-    const map = L.map(mapElement);
+    const map = L.map(mapElement, {
+        dragging: false,
+        touchZoom: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        zoomControl: false,
+    });
     L.Icon.Default.mergeOptions({
         iconSize: [44, 54],
         iconAnchor: [22, 54],
@@ -227,7 +235,10 @@ if (mapElement) {
         dashArray: '2, 8',
     }).addTo(map);
 
-    map.fitBounds([...markerLocations, ...boatRoute], { padding: [30, 30] });
+    const mapLocations = boatRoute.length > 0 ? boatRoute : markerLocations;
+    if (mapLocations.length > 0) {
+        map.fitBounds(mapLocations, { padding: [30, 30] });
+    }
 
     // A Leaflet divIcon lets us use inline SVG instead of a standard image marker.
     const boatIcon = L.divIcon({
