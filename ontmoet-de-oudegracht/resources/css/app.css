@@ -25,10 +25,46 @@
     border: 1px solid #e3e0d8;
     box-shadow: 0 16px 48px rgb(0 0 0 / 25%);
     margin: 40vh auto;
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition:
+        opacity 250ms ease,
+        transform 250ms ease,
+        overlay 250ms allow-discrete,
+        display 250ms allow-discrete;
+}
+
+.intro-dialog[open] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+@starting-style {
+    .intro-dialog[open] {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    .intro-dialog[open]::backdrop {
+        opacity: 0;
+    }
 }
 
 .intro-dialog::backdrop {
     background: rgb(0 20 43 / 65%);
+    opacity: 0;
+    transition: opacity 250ms ease;
+}
+
+.intro-dialog[open]::backdrop {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro-dialog,
+    .intro-dialog::backdrop {
+        transition-duration: 0.01ms;
+    }
 }
 
 .intro-dialog-title {
